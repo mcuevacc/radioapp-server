@@ -10,7 +10,8 @@ let Schema = mongoose.Schema;
 let musicSchema = new Schema({
     name: {
         type: String,
-        required: [true, 'El nombre es necesa']
+        required: [true, 'El nombre es necesario'],
+        trim: true
     },
     extension: {
         type: String,
@@ -19,14 +20,23 @@ let musicSchema = new Schema({
     },
     artist: {
         type: String,
-        required: false
+        required: false,
+        trim: true
     },
     title: {
         type: String,
-        required: false
+        required: false,
+        trim: true
     },
-    //categoria: { type: Schema.Types.ObjectId, ref: 'Categoria', required: true },
-    //usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
+    duration: {
+        type: Number,
+        required: true
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'El usuario es necesario']
+    },
 });
 
 module.exports = mongoose.model('Music', musicSchema);
