@@ -18,14 +18,14 @@ process.env.JWT_LIFE = '48h';
 //  Icecast
 // ============================
 process.env.ICE_HOST = process.env.ICE_HOST || 'localhost';
-process.env.ICE_PORT = process.env.ICE_HOST || 8000;
+process.env.ICE_PORT = process.env.ICE_PORT || 8000;
 process.env.ICE_USER = process.env.ICE_USER || 'source';
 process.env.ICE_PASSWORD = process.env.ICE_PASSWORD || '123456';
-process.env.ICE_MOUNT = process.env.ICE_MOUNT || 'radio';
+process.env.ICE_MOUNT = process.env.ICE_MOUNT || 'stream';
 process.env.ICE_FORMAT = process.env.ICE_FORMAT || 1; // 0=ogg, 1=mp3
-process.env.ICE_BITRATE = process.env.ICE_PASSWORD || '192';
-process.env.ICE_SAMPLERATE = process.env.ICE_PASSWORD || '44100';
-process.env.ICE_CHANNELS = process.env.ICE_PASSWORD || '2';
+process.env.ICE_BITRATE = process.env.ICE_BITRATE || '192';
+process.env.ICE_SAMPLERATE = process.env.ICE_SAMPLERATE || '44100';
+process.env.ICE_CHANNELS = process.env.ICE_CHANNELS || '2';
 
 // ============================
 //  Base de datos

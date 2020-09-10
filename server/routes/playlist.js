@@ -22,7 +22,7 @@ app.get(`${ prefix }`, validToken, async (req, res) => {
                 .limit(perPage);
         }
 
-        let playlists = await reqPlayList.sort('name')
+        let playlists = await reqPlayLists.sort('name')
             .populate('user', 'nombre email')
             .exec();
 

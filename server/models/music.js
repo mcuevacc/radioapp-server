@@ -15,7 +15,7 @@ let musicSchema = new Schema({
     },
     extension: {
         type: String,
-        default: 'mp3',
+        default: '.mp3',
         enum: extensionValid
     },
     artist: {

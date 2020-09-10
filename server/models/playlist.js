@@ -22,7 +22,7 @@ var playListSchema = new Schema({
     created: {
         type: Date,
         default: Date.now,
-    },
+    }
 });
 
 playListSchema.index({'user':1, 'name':1}, { unique: true });
