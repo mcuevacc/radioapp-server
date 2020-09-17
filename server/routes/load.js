@@ -13,7 +13,6 @@ let app = express();
 let Music = require('../models/music');
 let PlayList = require('../models/playlist');
 
-
 app.post('/load/:folderName', validToken, async (req, res) => {
     try {
         let user = req.user;
@@ -75,6 +74,5 @@ app.post('/load/:folderName', validToken, async (req, res) => {
         });
     }
 });
-
 
 module.exports = app;

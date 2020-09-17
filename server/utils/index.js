@@ -13,6 +13,20 @@ const shuffle = (a) => {
     return a;
 }
 
+const getExtension = (name) => name.split('.').slice(-1).pop();
+
+const validExtension = (extension, validExtensions) => validExtensions.includes(extension);
+
+const getRandomString = (length) => {
+    let characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    let result           = '';   
+    for ( let i=0; i<length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
 //exports.readSong = () => _readDir().filter(_isMp3)[0].name;
 
 //exports.discardFirstWord = str => str.substring(str.indexOf(' ') + 1);
@@ -21,6 +35,9 @@ const shuffle = (a) => {
 //exports.generateRandomId = () => Math.random().toString(36).slice(2);
 
 module.exports = {
+    getExtension,
+    getRandomString,
     readSongs,
-    shuffle
-}
+    shuffle,
+    validExtension
+};

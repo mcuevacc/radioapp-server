@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 let extensionValid = {
-    values: ['.mp3'],
+    values: ['mp3'],
     message: '{VALUE} no es una extensión válida'
 };
 
@@ -15,7 +15,7 @@ let musicSchema = new Schema({
     },
     extension: {
         type: String,
-        default: '.mp3',
+        default: 'mp3',
         enum: extensionValid
     },
     artist: {
@@ -32,10 +32,18 @@ let musicSchema = new Schema({
         type: Number,
         required: true
     },
+    image: {
+        type: String,
+        default: ''
+    },
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'El usuario es necesario']
+    },
+    private: {
+        type: Boolean,
+        default: false
     },
 });
 

@@ -21,7 +21,11 @@ let userSchema = new Schema({
     name: {
         type: String,
         required: false
-    },    
+    },
+    privateMusic: {
+        type: Boolean,
+        default: true
+    },
     img: {
         type: String,
         required: false
