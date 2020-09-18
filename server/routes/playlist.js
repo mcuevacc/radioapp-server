@@ -23,8 +23,7 @@ app.get(`${ prefix }`, validToken, async (req, res) => {
         }
 
         let playlists = await reqPlayLists.sort('name')
-            .populate('user', 'nombre email')
-            .exec();
+            .populate('user', 'nombre email');
 
         res.json({
             success: true,
@@ -45,8 +44,7 @@ app.get(`${ prefix }/:id`, validToken, async (req, res) => {
         let id = req.params.id;
 
         let playList = await PlayList.findOne({'_id':id, 'user': user.id })
-            .populate('musicList', '_id name title artist duration')
-            .exec();
+            .populate('musicList', '_id name title artist duration');
 
         if(!playList){
             return res.status(400).json({
@@ -71,10 +69,10 @@ app.get(`${ prefix }/:id`, validToken, async (req, res) => {
 app.post(`${ prefix }`, validToken, async (req, res) => {
     try {
         let user = req.user;
-        let body = req.body;
+        let {name} = req.body;
 
         let playlist = new PlayList({
-            name: body.name,
+            name,
             user: user.id,
         });
 
@@ -97,11 +95,11 @@ app.put(`${ prefix }/:id`, validToken, async (req, res) => {
     try {
         let user = req.user;
         let id = req.params.id;
-        let body = req.body;
+        let {name} = req.body;
 
         let playlistDB = await PlayList.findOneAndUpdate(
             { '_id': id, 'user': user.id },
-            { name: body.name },
+            { name },
             { new: true }
         );
 

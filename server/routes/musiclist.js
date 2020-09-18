@@ -1,45 +1,55 @@
 const express = require('express');
-const mediaserver = require('mediaserver');
 
-const global = require('../config/global');
-const service = require('../services');
 const { validToken } = require('../middlewares/authentication');
 
 let app = express();
 let Music = require('../models/music');
+let PlayList = require('../models/playlist');
 
-const prefix = '/play';
+const prefix = '/musiclist';
 
-app.get(`${ prefix }/music/:id`, validToken, async (req, res) => {
+app.put(`${ prefix }/add`, validToken, async (req, res) => {
     try {
         let user = req.user;
-        let id = req.params.id;
+        let {playlist, music} = req.body;
 
-        let musicDB = await Music.findOne({'_id':id})
+        let playlistDB = await PlayList.findOne({'_id': playlist, 'user': user.id});
+        if(!playlistDB){
+            return res.status(400).json({
+                success: false,
+                msg: 'PlayList no existe'
+            });
+        }
+
+        let musicDB = await Music.findOne({'_id': music})
             .populate('user','privateMusic');
         if(!musicDB){
             return res.status(400).json({
                 success: false,
-                msg: 'Música no existe'
+                msg: 'Music no existe'
             });
         }
 
         if((musicDB.private || musicDB.user.privateMusic) && musicDB.user._id.toString()!==user.id){
             return res.status(400).json({
                 success: false,
-                msg: 'No tiene permiso para escuchar el audio'
-            });
-        }
-        
-        let musicPath = `${global.musicAudioPath}/${musicDB.user._id}/${ id }.${ musicDB.extension}`;
-        if ( !service.existPathSync(musicPath)) {
-            return res.status(400).json({
-                success: false,
-                msg: 'Archivo de música no encontrado'
+                msg: 'No tiene permiso para el audio'
             });
         }
 
-        mediaserver.pipe(req, res, musicPath);
+        if(playlistDB.musicList.includes(music)){
+            return res.status(400).json({
+                success: false,
+                msg: 'Ya se ha agregado esa musica'
+            });
+        }
+
+        playlistDB.musicList.push(music);
+        playlistDB = await playlistDB.save();
+
+        res.json({
+            success: true
+        });
        
     } catch (err) {
         return res.status(500).json({

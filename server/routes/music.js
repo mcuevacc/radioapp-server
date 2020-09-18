@@ -16,8 +16,7 @@ app.get(`${ prefix }/:id`, validToken, async (req, res) => {
         let id = req.params.id;
 
         let music = await Music.findOne({'_id':id, 'user': user.id })
-            .populate('user', '_id email name')
-            .exec();
+            .populate('user', '_id email name');
 
         if(!music){
             return res.status(400).json({
