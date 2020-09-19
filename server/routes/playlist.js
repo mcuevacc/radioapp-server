@@ -121,7 +121,7 @@ app.delete(`${ prefix }/:id`, validToken, async (req, res) => {
         let user = req.user;
         let id = req.params.id;
 
-        let playlistDB = await PlayList.findOneAndRemove(
+        let playlistDB = await PlayList.deleteOne(
             { '_id': id, 'user': user.id }
         );
 

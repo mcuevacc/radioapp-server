@@ -1,9 +1,9 @@
 const express = require('express');
 
 const global = require('../config/global');
-const util = require('../utils');
 const service = require('../services');
 const { validToken } = require('../middlewares/authentication');
+const musicService = require('../services/music-service');
 
 let app = express();
 let Music = require('../models/music');
@@ -43,72 +43,19 @@ app.post(`${ prefix }`, validToken, async (req, res) => {
         let {name, artist, title, file, extension, private} = req.body;
 
         let musicPath = `${global.tmpPath}/${user.id}_${file}.${extension}`;
-        if (!service.existPathSync(musicPath)) {
-            return res.status(400).json({
-                success: false,
-                msg: 'No se ha encontrado el archivo'
-            });
-        }
 
-        if(!util.validExtension(extension, global.musicExtensions)){
-            return res.status(400).json({
-                success: false,
-                msg: 'Extension del archivo no válido'
-            });
-        }
-
-        let tags = { title, artist };
-        if(!service.updateMusicTags(tags, musicPath)){
-            return res.status(400).json({
-                success: false,
-                msg: 'Error al establecer los tags'
-            });
-        }
-
-        let duration = await service.getMusicDuration(musicPath);
-
-        let music = new Music({
-            name,
-            extension,
-            user: user.id,
-            artist,
-            title,
-            duration,
-            private
+        let resp = await musicService.create({
+            name, artist, title, extension, private, musicPath, userId: user.id
         });
 
-        tags = service.getMusicTags(musicPath);
-        if(tags.image){
-            let imageName = `${music._id}.${tags.image.mime}`;
-            let imagePath = `${global.tmpPath}/${imageName}`;
-            service.writeFileSync(imagePath, tags.image.imageBuffer);
-            let newImagePath = `${global.musicImagePath}/${user.id}/${imageName}`;
-            let error = await service.moveFile(imagePath, newImagePath);
-            if(error){
-                return res.status(400).json({
-                    success: false,
-                    msg: 'Error al mover el archivo de imagen'
-                });
-            }
-
-            music.image = imageName;
-        }       
-
-        let newMusicPath = `${global.musicAudioPath}/${user.id}/${music._id}.${music.extension}`;
-        let error = await service.moveFile(musicPath, newMusicPath);
-        if(error){
-            return res.status(400).json({
+        if(!resp.success){
+            return res.status(resp.status).json({
                 success: false,
-                msg: 'Error al mover el archivo de audio'
+                msg: resp.msg
             });
         }
-
-        let musicDB = await music.save();
-
-        res.json({
-            success: true,
-            data: musicDB
-        });
+        
+        res.json(resp);
        
     } catch (err) {
         return res.status(500).json({
@@ -152,6 +99,32 @@ app.put(`${ prefix }/:id`, validToken, async (req, res) => {
             data: musicDB
         });
        
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            msg: err.message
+        });
+    }
+});
+
+app.delete(`${ prefix }/:id`, validToken, async (req, res) => {
+    try {
+        let user = req.user;
+        let musicId = req.params.id;
+
+        let resp = await musicService.remove({
+            musicId, userId: user.id
+        });
+
+        if(!resp.success){
+            return res.status(resp.status).json({
+                success: false,
+                msg: resp.msg
+            });
+        }
+
+        res.json(resp);
+
     } catch (err) {
         return res.status(500).json({
             success: false,

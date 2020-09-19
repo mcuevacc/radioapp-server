@@ -47,4 +47,17 @@ let musicSchema = new Schema({
     },
 });
 
+musicSchema.post("findOneAndDelete", async (doc) => {
+    console.log('Post Delete', doc);
+    /*
+    if (doc) {
+      const deleteResult = await ProjectChild.deleteMany({
+        parentProject: doc._id
+      });
+  
+      console.log("Child delete result: ", deleteResult);
+    }
+    */
+});
+
 module.exports = mongoose.model('Music', musicSchema);

@@ -11,6 +11,8 @@ const hashPwd = (password) => bcrypt.hashSync(password, saltHashPwd);
 
 const comparePwd = (password, hashedPassword) => bcrypt.compareSync(password, hashedPassword);
 
+const deleteFileSync = (filePath) => fs.unlinkSync(filePath);
+
 const getToken = (user) => {
     let {_id:id, email, role} = user;
 
@@ -42,6 +44,7 @@ const writeFileSync = (filePath, data) => fs.writeFileSync(filePath, data);
 module.exports = {
     comparePwd,
     createPath,
+    deleteFileSync,
     existPathSync,
     getMusicDuration,
     getMusicTags,
