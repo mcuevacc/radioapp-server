@@ -1,10 +1,3 @@
-const fs = require('fs');
-const { extname } = require('path');
-
-const readSongs = (folderPath) => readDir(folderPath).filter(isMp3).map((songItem) => ({name: songItem.name, extension:extname(songItem.name)}));
-const readDir = (folderPath) => fs.readdirSync(folderPath, { withFileTypes: true });
-const isMp3 = (item) => item.isFile && extname(item.name) === '.mp3';
-
 const shuffle = (a) => {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -16,6 +9,14 @@ const shuffle = (a) => {
 const getExtension = (name) => name.split('.').slice(-1).pop();
 
 const validExtension = (extension, validExtensions) => validExtensions.includes(extension);
+
+function isFileWithExtension (item) {
+    let valid = true;
+    if(this.extensions){
+        valid = validExtension(getExtension(item.name), this.extensions);
+    }
+    return item.isFile && valid;
+};
 
 const getRandomString = (length) => {
     let characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -37,7 +38,7 @@ const getRandomString = (length) => {
 module.exports = {
     getExtension,
     getRandomString,
-    readSongs,
+    isFileWithExtension,
     shuffle,
     validExtension
 };

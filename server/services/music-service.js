@@ -24,14 +24,17 @@ const create = async (params) => {
             };
         }
 
-        let tags = { title, artist };
-        if(!service.updateMusicTags(tags, musicPath)){
+        let tags = service.getMusicTags(musicPath);
+        if(!artist || !title){
+            artist = artist || tags.artist;
+            title = title || tags.title;
+        }else if(!service.updateMusicTags({artist, title}, musicPath)){
             return {
                 success: false,
                 msg: 'Error al establecer los tags',
                 status: 400
             };
-        }
+        }       
 
         let duration = await service.getMusicDuration(musicPath);
 
@@ -45,7 +48,6 @@ const create = async (params) => {
             private
         });
 
-        tags = service.getMusicTags(musicPath);
         if(tags.image){
             let imageName = `${music._id}.${tags.image.mime}`;
             let imagePath = `${global.tmpPath}/${imageName}`;

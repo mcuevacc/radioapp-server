@@ -1,16 +1,12 @@
 const express = require('express');
-const fs= require('fs');
-const mv = require('mv');
-const path = require('path');
-const mp3Duration = require('mp3-duration');
-const NodeID3 = require('node-id3');
 
 const global = require('../config/global');
+const util = require('../utils');
+const service = require('../services');
 const { validToken } = require('../middlewares/authentication');
-const { readSongs } = require('../utils');
+const musicService = require('../services/music-service');
 
 let app = express();
-let Music = require('../models/music');
 let PlayList = require('../models/playlist');
 
 app.post('/load/:folderName', validToken, async (req, res) => {
@@ -18,12 +14,12 @@ app.post('/load/:folderName', validToken, async (req, res) => {
         let user = req.user;
         let folderName = req.params.folderName;
 
-        let folderPath = `${ global.uploadPath }/new/${ folderName }`
-        if ( !fs.existsSync(folderPath)) {
+        let folderPath = `${ global.uploadRootPath }/new/${ folderName }`;
+        if ( !service.existPathSync(folderPath)) {
             return res.status(400).json({
-                    success: false,
-                    msg: 'No se ha encontrado la carpeta'
-                });
+                success: false,
+                msg: 'No se ha encontrado la carpeta'
+            });
         }
 
         let playlist = new PlayList({
@@ -31,42 +27,32 @@ app.post('/load/:folderName', validToken, async (req, res) => {
             user: user.id,
         });
 
+        let musics = service.getAllFileDir(folderPath, global.musicExtensions);
+
+        let promises = [];
+        musics.forEach(musicName => {
+            let extension = util.getExtension(musicName);
+            let name = musicName.substring(0, musicName.length-extension.length-1)
+            let musicPath = `${ folderPath }/${ musicName }`;
+
+            promises.push(musicService.create({name, extension, private:false, musicPath, userId:user.id}));
+        });
+
+        let respPromises = await Promise.all(promises);
+        respPromises.forEach(resp => {
+            if(!resp.success){
+                console.log(resp.msg);
+            }else{
+                playlist.musicList.push(resp.data._id);
+            }
+        });
         let playlistDB = await playlist.save();
 
-        let songs = readSongs(folderPath);
-        songs.forEach(song => {
-            let musicPath = `${ folderPath }/${ song.name }`;
-
-            mp3Duration(musicPath, async function (err, duration) {
-                if (err) return console.log(err.message);
-
-                let tag = NodeID3.read(musicPath);
-
-                let music = new Music({
-                    name: path.basename(song.name, song.extension),
-                    extension: song.extension,
-                    user: user.id,
-                    title: tag.title,
-                    artist: tag.artist,
-                    duration
-                });
-
-                let musicDB = await music.save();
-
-                let newPath = `${ global.uploadPath }/music/${ user.id }/${ musicDB._id }${ musicDB.extension }`;
-                mv(musicPath, newPath, {mkdirp: true}, function(err) {
-                    if (err) return console.log(err.message);
-                })
-
-                playlistDB.musicList.push(musicDB._id);
-
-                playlistDB.save();
-            });       
-        });
-        
         res.json({
             success: true,
+            data: playlistDB
         });
+
     } catch (err) {
         return res.status(500).json({
             success: false,

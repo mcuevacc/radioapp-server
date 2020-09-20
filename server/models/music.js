@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+let PlayList = require('../models/playlist');
+
 let extensionValid = {
     values: ['mp3'],
     message: '{VALUE} no es una extensión válida'
@@ -47,17 +49,15 @@ let musicSchema = new Schema({
     },
 });
 
-musicSchema.post("findOneAndDelete", async (doc) => {
-    console.log('Post Delete', doc);
-    /*
-    if (doc) {
-      const deleteResult = await ProjectChild.deleteMany({
-        parentProject: doc._id
-      });
-  
-      console.log("Child delete result: ", deleteResult);
+musicSchema.post("findOneAndDelete", async (music) => {
+    if (music) {
+        const updateResult = await PlayList.updateMany(
+            { musicList: { "$in" : [music._id]} },
+            { $pull: { musicList: music._id }}
+         );
+
+        console.log("PlayList update result for delete music: ", updateResult);
     }
-    */
 });
 
 module.exports = mongoose.model('Music', musicSchema);

@@ -4,7 +4,7 @@ const app = express();
 
 app.use(require('./auth'));
 app.use(require('./image'));
-//app.use(require('./load'));
+app.use(require('./load'));
 app.use(require('./music'));
 app.use(require('./musiclist'));
 app.use(require('./play'));

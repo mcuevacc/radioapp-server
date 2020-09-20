@@ -6,6 +6,7 @@ const codRecord = 'RECORD';
 const minRadioPlayList = 2;
 
 const perPage = 5;
+const uploadRootPath = path.resolve(__dirname, '../../uploads');
 const tmpPath = path.resolve(__dirname, '../../uploads/tmp');
 const musicAudioPath = path.resolve(__dirname, '../../uploads/audio/music');
 const musicImagePath = path.resolve(__dirname, '../../uploads/image/music');
@@ -26,5 +27,6 @@ module.exports = {
     perPage,
     saltHashPwd,
     tmpHashLength,
-    tmpPath
+    tmpPath,
+    uploadRootPath
 }

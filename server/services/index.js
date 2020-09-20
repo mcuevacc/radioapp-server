@@ -5,6 +5,7 @@ const NodeID3 = require('node-id3');
 const mp3Duration = require('mp3-duration');
 const mv = require('mv');
 
+const { isFileWithExtension } = require('../utils')
 const { saltHashPwd } = require('../config/global')
 
 const hashPwd = (password) => bcrypt.hashSync(password, saltHashPwd);
@@ -41,16 +42,26 @@ const existPathSync = (path) => fs.existsSync(path);
 
 const writeFileSync = (filePath, data) => fs.writeFileSync(filePath, data);
 
+const readDirSync = (path) => fs.readdirSync(path, { withFileTypes: true });
+
+const getAllFileDir = (path, formats) => readDirSync(path).filter(isFileWithExtension, {formats}).map((file) => file.name);
+/*
+const readSongs = (folderPath) => readDir(folderPath).filter(isMp3).map((songItem) => ({name: songItem.name, extension:extname(songItem.name)}));
+const readDir = (folderPath) => fs.readdirSync(folderPath, { withFileTypes: true });
+const isMp3 = (item) => item.isFile && extname(item.name) === '.mp3';
+*/
 module.exports = {
     comparePwd,
     createPath,
     deleteFileSync,
     existPathSync,
+    getAllFileDir,
     getMusicDuration,
     getMusicTags,
     getToken,
     hashPwd,
     moveFile,
     updateMusicTags,
+    readDirSync,
     writeFileSync
 };
