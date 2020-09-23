@@ -6,12 +6,12 @@ const {shuffle} = require('../utils');
 
 let RadioList = require('../models/radiolist');
 let PlayList = require('../models/playlist');
-let Audio = require('../models/audio');
+let User = require('../models/user');
+//let Record = require('../models/record');
 
 class Radio {
     constructor() {
         console.log("Llamando al constructor");
-
         nodeshout.init();
         console.log('Libshout version: ' + nodeshout.getVersion());
 
@@ -29,39 +29,46 @@ class Radio {
     }
 
     async addRandomList(radiolist) {
-        //try {
+        try {
             console.log("Llamando a addRandomList");
-
-            console.log(radiolist);
+            let admins = await User.find({
+                role: { $in: ['admin'] },
+                isActive: true,
+                privateMusic: false
+            });
+            if( !admins.length){
+                return {success: false};
+            }
+            admins = admins.map((admin)=>admin._id);
 
             let adminPlayLists = await PlayList
-                .find({ $where: `this.musicList.length >= ${global.minRadioPlayList}` })
-                .populate({
-                    path: 'user',
-                    match: { role: { $in: ['admin'] }}
-                    //select: 'name age -_id'
-                })
-                .exec();
+                .find({$where: `this.musicList.length >= ${global.minRadioPlayList}`})
+                .where('user').in(admins)
+                .populate('musicList');
 
-            if( !adminPlayLists.length){
+            adminPlayLists = shuffle(adminPlayLists);
+            let queueList = [];
+            for (let adminPlayList of adminPlayLists) {
+                let user = adminPlayList.user;
+                let musicList = shuffle(adminPlayList.musicList);
+                queueList = musicList.filter((music)=>!music.private).map((music)=>({music: music._id, user}));
+                if(queueList.length){
+                    break;
+                }
+            }
+            if(!queueList.length){
                 return {success: false};
             }
 
-            let index = Math.floor(Math.random() * adminPlayLists.length);
-            let user = adminPlayLists[index]['user'];
-            let musicList = shuffle(adminPlayLists[index]['musicList']);
-            musicList.forEach(music => {
-                radiolist.queueList.push({music, user});
-            });
-
+            queueList.forEach((music) => {radiolist.queueList.push(music)});      
             await radiolist.save();
 
             return {success: true, data: await radiolist.populate('queueList.music').execPopulate()}
-/*
+
         } catch (err) {
             console.log(err.message);
             return {success:false};
-        }*/
+        }
     }
 
     async createRadioList() {
@@ -82,9 +89,8 @@ class Radio {
     }
 
     async playMusic () {
-        //try {
+        try {
             console.log("Llamando a playMusic");
-            //await this.audio();
 
             let radioList = await RadioList.findOne({'cod': global.codRadio})
                 .populate('queueList.music')
@@ -111,15 +117,14 @@ class Radio {
                 success: true
             }
 
-        /*
         } catch (err) {
             console.log(err.message);
-        }*/
+        }
     }
 
     sendMusic(nowPlay) {
         let music = nowPlay.music;
-        var fileStream = new FileReadStream(`${ global.uploadPath }/music/${ music.user }/${ music._id }${ music.extension }`, 65536),
+        var fileStream = new FileReadStream(`${ global.musicAudioPath }/${ music.user }/${ music._id }.${ music.extension }`, 65536),
             shoutStream = fileStream.pipe(new ShoutStream(this.shout));
 
         fileStream.on('data', function(chunk) {
@@ -132,62 +137,6 @@ class Radio {
             self.playMusic();
         });
     }
-    /*
-    sendMusic2(nowPlay) {
-        //nodeshout.init();
-
-        console.log(nowPlay);
-
-        console.log('Libshout version: ' + nodeshout.getVersion());
-
-        // Create instance and configure it.
-        var shout = nodeshout.create();
-        shout.setHost('localhost');
-        shout.setPort(8000);
-        shout.setUser('source');
-        shout.setPassword('123456');
-        shout.setMount('stream');
-        shout.setFormat(1); // 0=ogg, 1=mp3
-        shout.setAudioInfo('bitrate', '192');
-        shout.setAudioInfo('samplerate', '44100');
-        shout.setAudioInfo('channels', '2');
-
-        shout.open();
-
-        // Create file read stream and shout stream
-        let music = nowPlay.music;
-        var fileStream = new FileReadStream(`${ global.uploadPath }/music/${ music.user }/${ music._id }${ music.extension }`, 65536),
-            shoutStream = fileStream.pipe(new ShoutStream(shout));
-
-        fileStream.on('data', function(chunk) {
-            console.log('Read %d bytes of data', chunk.length);
-        });
-
-        shoutStream.on('finish', function() {
-            console.log('Finished playing...');
-        });
-    }
-    */
-    async audio() {
-        console.log("Llamando a audio");
-        let audio = new Audio({duration:150.05, user:"5f4ef9fe3a23f1102f2a8a69"});
-        await audio.save()
-    }
 }
-
-/*
-
-var fileStream = new FileReadStream('./music.mp3', 65536),
-    shoutStream = fileStream.pipe(new ShoutStream(shout));
-
-fileStream.on('data', function(chunk) {
-    console.log('Read %d bytes of data', chunk.length);
-});
-
-shoutStream.on('finish', function() {
-    console.log('Finished playing...');
-});
-
-*/
 
 module.exports = Radio;

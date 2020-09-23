@@ -52,7 +52,7 @@ let musicSchema = new Schema({
 musicSchema.post("findOneAndDelete", async (music) => {
     if (music) {
         const updateResult = await PlayList.updateMany(
-            { musicList: { "$in" : [music._id]} },
+            { musicList: { '$in' : [music._id]} },
             { $pull: { musicList: music._id }}
          );
 
