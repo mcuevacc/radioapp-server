@@ -10,6 +10,7 @@ let Music = require('../models/music');
 
 const prefix = '/play';
 
+//app.get(`${ prefix }/music/:id`, async (req, res) => {
 app.get(`${ prefix }/music/:id`, validToken, async (req, res) => {
     try {
         let user = req.user;

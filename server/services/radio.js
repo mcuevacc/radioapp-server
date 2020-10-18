@@ -91,7 +91,6 @@ class Radio {
     async playMusic () {
         try {
             console.log("Llamando a playMusic");
-
             let radioList = await RadioList.findOne({'cod': global.codRadio})
                 .populate('queueList.music')
                 //.populate('queueList.audio')
@@ -110,6 +109,7 @@ class Radio {
             let nowPlay = radioList.queueList.$pop();
 
             this.sendMusic(nowPlay);
+            this.sendMetadata(nowPlay);
 
             await radioList.save();
 
@@ -123,6 +123,7 @@ class Radio {
     }
 
     sendMusic(nowPlay) {
+        console.log("Llamando a sendMusic");
         let music = nowPlay.music;
         var fileStream = new FileReadStream(`${ global.musicAudioPath }/${ music.user }/${ music._id }.${ music.extension }`, 65536),
             shoutStream = fileStream.pipe(new ShoutStream(this.shout));
@@ -136,6 +137,13 @@ class Radio {
             console.log('Finished playing...');
             self.playMusic();
         });
+    }
+
+    sendMetadata(nowPlay) {
+        console.log("Llamando a sendMetadata");
+        var metadata = nodeshout.createMetadata();
+        metadata.add('song', nowPlay.music.name);
+        this.shout.setMetadata(metadata);
     }
 }
 
