@@ -10,19 +10,19 @@ const getExtension = (name) => name.split('.').slice(-1).pop();
 
 const validExtension = (extension, validExtensions) => validExtensions.includes(extension);
 
-function isFileWithExtension (item) {
+function isFileWithExtension(item) {
     let valid = true;
-    if(this.extensions){
+    if (this.extensions) {
         valid = validExtension(getExtension(item.name), this.extensions);
     }
     return item.isFile && valid;
 };
 
 const getRandomString = (length) => {
-    let characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
     let charactersLength = characters.length;
-    let result           = '';   
-    for ( let i=0; i<length; i++ ) {
+    let result = '';
+    for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;

@@ -1,3 +1,1 @@
-const express = require('express');
-
-let app = express();
+let app = require('express')();

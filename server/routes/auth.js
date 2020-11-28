@@ -1,14 +1,12 @@
-const express = require('express');
-
 const { hashPwd, comparePwd, getToken } = require('../services');
 const { validToken } = require('../middlewares/authentication');
 
-let app = express();
+let app = require('express')();
 let User = require('../models/user');
 
 const prefix = '/auth';
 
-app.post(`${ prefix }/register`, async (req, res) => {
+app.post(`${ prefix }/register`, async(req, res) => {
     try {
         let body = req.body;
 
@@ -32,7 +30,7 @@ app.post(`${ prefix }/register`, async (req, res) => {
     }
 });
 
-app.post(`${ prefix }/login`, async (req, res) => {
+app.post(`${ prefix }/login`, async(req, res) => {
     try {
         let body = req.body;
 
@@ -44,7 +42,7 @@ app.post(`${ prefix }/login`, async (req, res) => {
             });
         }
 
-        if ( !comparePwd(body.password, userDB.password) ) {
+        if (!comparePwd(body.password, userDB.password)) {
             return res.status(400).json({
                 success: false,
                 msg: 'Usuario o (contraseña) incorrectos'
@@ -65,12 +63,12 @@ app.post(`${ prefix }/login`, async (req, res) => {
     }
 });
 
-app.post(`${ prefix }/token`, validToken, async (req, res) => {
+app.post(`${ prefix }/token`, validToken, async(req, res) => {
     try {
         let user = req.user;
 
         let userDB = await User.findOne({ email: user.email });
-        
+
         res.json({
             success: true,
             usuario: userDB,

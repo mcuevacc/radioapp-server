@@ -1,4 +1,3 @@
-const express = require('express');
 const fileUpload = require('express-fileupload');
 
 const global = require('../config/global');
@@ -6,12 +5,12 @@ const util = require('../utils');
 const service = require('../services');
 const { validToken } = require('../middlewares/authentication');
 
-let app = express();
+let app = require('express')();
 app.use(fileUpload());
 
 const prefix = '/upload';
 
-app.post(`${ prefix }/music`, validToken, async (req, res) => {
+app.post(`${ prefix }/music`, validToken, async(req, res) => {
     try {
         let user = req.user;
 
@@ -24,7 +23,7 @@ app.post(`${ prefix }/music`, validToken, async (req, res) => {
 
         let music = req.files.music;
 
-        if(music.size > global.musicSize){
+        if (music.size > global.musicSize) {
             return res.status(400).json({
                 success: false,
                 msg: 'Archivo demasido grande'
@@ -32,7 +31,7 @@ app.post(`${ prefix }/music`, validToken, async (req, res) => {
         }
 
         let extension = util.getExtension(music.name);
-        if(!util.validExtension(extension, global.musicExtensions)){
+        if (!util.validExtension(extension, global.musicExtensions)) {
             return res.status(400).json({
                 success: false,
                 msg: 'Extension del archivo no válido'
@@ -47,10 +46,10 @@ app.post(`${ prefix }/music`, validToken, async (req, res) => {
         let tmpMusicPath = `${folderPath}/${tmpMusicName}`;
         await music.mv(`${tmpMusicPath}`);
 
-        let {artist, title} = service.getMusicTags(tmpMusicPath);
+        let { artist, title } = service.getMusicTags(tmpMusicPath);
 
         res.json({
-            success:true,
+            success: true,
             data: {
                 file: tmpHashName,
                 extension,
