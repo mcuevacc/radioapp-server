@@ -1,12 +1,12 @@
-const { validToken } = require('../middlewares/authentication');
+const { validToken } = require('../../middlewares/authentication');
 
 let app = require('express')();
 
-const prefix = '/radio';
+const prefix = '/radio/server';
 
 app.get(`${ prefix }/metadata`, async(req, res) => {
     try {
-        let { radio } = require('../server');
+        let { radio } = require('../../server');
         if (!radio.isPlaying) {
             return res.status(500).json({
                 success: false,
@@ -30,7 +30,7 @@ app.get(`${ prefix }/metadata`, async(req, res) => {
 
 app.post(`${ prefix }/play`, validToken, async(req, res) => {
     try {
-        let { radio } = require('../server');
+        let { radio } = require('../../server');
         res.json(await radio.playMusic());
 
     } catch (err) {
@@ -43,7 +43,7 @@ app.post(`${ prefix }/play`, validToken, async(req, res) => {
 
 app.post(`${ prefix }/stop`, validToken, async(req, res) => {
     try {
-        let { radio } = require('../server');
+        let { radio } = require('../../server');
         res.json(radio.stopMusic());
 
     } catch (err) {
@@ -56,7 +56,7 @@ app.post(`${ prefix }/stop`, validToken, async(req, res) => {
 
 app.post(`${ prefix }/skip`, validToken, async(req, res) => {
     try {
-        let { radio } = require('../server');
+        let { radio } = require('../../server');
         res.json(radio.skipMusic());
 
     } catch (err) {
