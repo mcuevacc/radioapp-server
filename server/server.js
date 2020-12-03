@@ -1,16 +1,20 @@
 require('./config/config');
 
-const express = require('express');
-const mongoose = require('mongoose');
+const express = require('express');;
 const bodyParser = require('body-parser');
-const Radio = require('./services/radio');
-
 const path = require('path');
 
+const db = require('./config/db');
+db(process.env.URLDB);
+
+const Radio = require('./services/radio');
+module.exports.radio = new Radio();
+
 const app = express();
+
 app.use(bodyParser.json());
 app.use(express.static(path.resolve(__dirname, '../public')));
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
@@ -18,20 +22,6 @@ app.use(function (req, res, next) {
     next();
 });
 app.use(require('./routes'));
-
-module.exports.radio = new Radio();
-
-mongoose.connect(process.env.URLDB, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-        useCreateIndex: true
-    },
-    (err, res) => {
-        if (err) throw err;
-        console.log('Base de datos ONLINE');
-    }
-);
 
 app.listen(process.env.PORT, async() => {
     console.log('Escuchando puerto: ', process.env.PORT);

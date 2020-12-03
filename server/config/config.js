@@ -1,8 +1,8 @@
 // ============================
 //  App
 // ============================
-process.env.APP_DOMAIN = process.env.APP_DOMAIN || 'vitalsign.com';
-process.env.APP_SUBDOMAIN = process.env.APP_SUBDOMAIN || 'app';
+process.env.APP_DOMAIN = process.env.APP_DOMAIN || 'localhost:4200';
+process.env.APP_SUBDOMAIN = process.env.APP_SUBDOMAIN || '';
 
 // ============================
 //  Puerto
@@ -50,7 +50,7 @@ process.env.URLDB = urlDB;
 // ============================
 //  Socket Server
 // ============================
-process.env.SOCKET_HOST = process.env.SOCKET_HOST || 'http://localhost:3001';
+process.env.SOCKET_HOST = process.env.SOCKET_HOST || 'https://wsmcuevapps.herokuapp.com';
 
 // ============================
 //  Path Files
