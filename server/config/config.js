@@ -1,3 +1,5 @@
+const dotenv = require('dotenv').config();
+
 // ============================
 //  App
 // ============================
@@ -38,20 +40,9 @@ process.env.ICE_BURST_SIZE = process.env.ICE_BURST_SIZE || 131072;
 // ============================
 //  Base de datos
 // ============================
-let urlDB;
-
-if (process.env.NODE_ENV === 'dev') {
-    urlDB = 'mongodb://localhost/radio';
-} else {
-    urlDB = process.env.MONGO_URI;
-}
-process.env.URLDB = urlDB;
+process.env.DB_URL = process.env.DB_URL || 'mongodb://localhost/radio';
 
 // ============================
 //  Socket Server
 // ============================
 process.env.SOCKET_HOST = process.env.SOCKET_HOST || 'https://wsmcuevapps.herokuapp.com';
-
-// ============================
-//  Path Files
-// ============================

@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const db = require('./config/db');
-db(process.env.URLDB);
+db(process.env.DB_URL);
 
 const Radio = require('./services/radio');
 module.exports.radio = new Radio();
